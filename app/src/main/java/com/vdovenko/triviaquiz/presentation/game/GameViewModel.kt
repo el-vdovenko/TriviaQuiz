@@ -29,6 +29,12 @@ class GameViewModel @Inject constructor(
 
     private var _retryCount = 0
 
+    private val _correctAnswers = MutableStateFlow(0)
+    val correctAnswer: StateFlow<Int> = _correctAnswers
+
+    private val _totalQuestions = MutableStateFlow(0)
+    val totalQuestions: MutableStateFlow<Int> = _totalQuestions
+
     init {
         _screenState.value = GameScreenState.Loading
         loadQuestions()
@@ -78,10 +84,9 @@ class GameViewModel @Inject constructor(
         }
     }
 
-    fun nextQuestion() {
+    private fun nextQuestion() {
 
         if (_currentIndex.value >= _questionsStorage.value.size - 1) {
-            println("No questions")
             _screenState.value = GameScreenState.Loading
             if (!_isLoadingQuestions) {
                 loadQuestions()
@@ -89,19 +94,23 @@ class GameViewModel @Inject constructor(
             return
         }
 
+        _totalQuestions.value++
         _screenState.value =
             GameScreenState.ShowQuestion(_questionsStorage.value[_currentIndex.value])
         _currentIndex.value++
 
         if (_currentIndex.value == _questionsStorage.value.size - 2) {
-            println("Call loading")
             loadQuestions()
         }
     }
 
-    fun checkAnswer(answer: Answer) {
+    fun countAnswer(answer: Answer) {
         if (answer.isCorrect) {
-            TODO()
+            _correctAnswers.value++
+        }
+        viewModelScope.launch {
+            delay(DELAY_FOR_NEXT_QUESTION)
+            nextQuestion()
         }
     }
 
@@ -120,5 +129,6 @@ class GameViewModel @Inject constructor(
 
         private const val QUESTIONS_LOAD_AMOUNT = 20
         private const val RETRY_DELAY = 5000L
+        private const val DELAY_FOR_NEXT_QUESTION = 1000L
     }
 }

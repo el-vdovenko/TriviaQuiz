@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -12,6 +13,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vdovenko.triviaquiz.getApplicationComponent
 import com.vdovenko.triviaquiz.presentation.game.GameScreen
 import com.vdovenko.triviaquiz.presentation.game.GameViewModel
+import com.vdovenko.triviaquiz.ui.theme.ExtraDarkBlue
 import com.vdovenko.triviaquiz.ui.theme.TriviaQuizTheme
 
 class MainActivity : ComponentActivity() {
@@ -25,7 +27,11 @@ class MainActivity : ComponentActivity() {
             val viewModel: GameViewModel = viewModel(factory = component.getViewModelFactory())
 
             TriviaQuizTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Scaffold(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(ExtraDarkBlue)
+                ) { innerPadding ->
                     GameScreen(modifier = Modifier.padding(innerPadding))
                 }
             }

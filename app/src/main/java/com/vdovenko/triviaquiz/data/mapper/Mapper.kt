@@ -8,8 +8,8 @@ import com.vdovenko.triviaquiz.domain.entities.Category
 import com.vdovenko.triviaquiz.domain.entities.Question
 
 fun QuestionDTO.toEntity(): Question {
-    val answers = this.incorrectAnswers.map { stringToAnswer(it) }.toMutableList()
-    answers.add(stringToAnswer(this.correctAnswer, true))
+    val answers = this.incorrectAnswers.map { stringToAnswer(convertText(it)) }.toMutableList()
+    answers.add(stringToAnswer(convertText(this.correctAnswer), true))
     answers.shuffle()
     return Question(
         question = question,
