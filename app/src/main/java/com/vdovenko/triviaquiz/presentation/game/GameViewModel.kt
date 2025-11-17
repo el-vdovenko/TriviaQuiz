@@ -1,0 +1,124 @@
+package com.vdovenko.triviaquiz.presentation.game
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.vdovenko.triviaquiz.domain.entities.Answer
+import com.vdovenko.triviaquiz.domain.entities.DataError
+import com.vdovenko.triviaquiz.domain.entities.Question
+import com.vdovenko.triviaquiz.domain.entities.Resource
+import com.vdovenko.triviaquiz.domain.usecases.GetQuestionsUseCase
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+class GameViewModel @Inject constructor(
+    private val getQuestionsUseCase: GetQuestionsUseCase
+) : ViewModel() {
+
+    private val _questionsStorage = MutableStateFlow<List<Question>>(emptyList())
+
+    private val _currentIndex = MutableStateFlow(0)
+
+    private val _screenState: MutableStateFlow<GameScreenState> =
+        MutableStateFlow(GameScreenState.Initial)
+    val screenState: StateFlow<GameScreenState> = _screenState
+
+    private var _isLoadingQuestions: Boolean = false
+
+    private var _retryCount = 0
+
+    init {
+        _screenState.value = GameScreenState.Loading
+        loadQuestions()
+    }
+
+    private fun loadQuestions() {
+
+        if (_isLoadingQuestions) {
+            return
+        }
+
+        _isLoadingQuestions = true
+
+        viewModelScope.launch {
+
+            val result = getQuestionsUseCase(
+                categoryId = 11,
+                difficulty = "medium",
+                amount = QUESTIONS_LOAD_AMOUNT
+            )
+            _isLoadingQuestions = false
+
+            when (result) {
+                is Resource.Success -> {
+                    _questionsStorage.value += result.data
+                    _retryCount = 0
+
+                    if (_screenState.value == GameScreenState.Loading) {
+                        nextQuestion()
+                    }
+                }
+
+                is Resource.Error -> {
+                    when (result.error) {
+                        DataError.Network.NO_INTERNET -> {}
+                        DataError.Network.TOO_MANY_REQUESTS, DataError.Api.RATE_LIMIT -> {
+                            retryLoad()
+                            return@launch
+                        }
+                        else -> {
+                            _screenState.value =
+                                GameScreenState.ErrorScreen("${result.error} ${result.message}")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun nextQuestion() {
+
+        if (_currentIndex.value >= _questionsStorage.value.size - 1) {
+            println("No questions")
+            _screenState.value = GameScreenState.Loading
+            if (!_isLoadingQuestions) {
+                loadQuestions()
+            }
+            return
+        }
+
+        _screenState.value =
+            GameScreenState.ShowQuestion(_questionsStorage.value[_currentIndex.value])
+        _currentIndex.value++
+
+        if (_currentIndex.value == _questionsStorage.value.size - 2) {
+            println("Call loading")
+            loadQuestions()
+        }
+    }
+
+    fun checkAnswer(answer: Answer) {
+        if (answer.isCorrect) {
+            TODO()
+        }
+    }
+
+    private suspend fun retryLoad() {
+        if (_retryCount == 2) {
+            _screenState.value = GameScreenState.ErrorScreen("")
+            _retryCount = 0
+            return
+        }
+        _retryCount++
+        delay(RETRY_DELAY)
+        loadQuestions()
+    }
+
+    companion object {
+
+        private const val QUESTIONS_LOAD_AMOUNT = 20
+        private const val RETRY_DELAY = 5000L
+    }
+}
