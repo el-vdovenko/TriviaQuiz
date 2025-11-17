@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,20 +18,25 @@ import androidx.compose.ui.unit.dp
 fun AnswerButton(
     modifier: Modifier = Modifier,
     text: String,
-    conteinerColor: Color = CardBlue,
-    onClick: () -> Unit
+    containerColor: Color = CardBlue,
+    borderColor: Color = CardBorderBlue,
+    onClick: () -> Unit,
+    enabled: Boolean = true
 ) {
     Button(
         modifier = modifier
             .fillMaxWidth()
             .height(72.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = conteinerColor,
-            contentColor = LightBlue
+        colors = ButtonColors(
+            containerColor = containerColor,
+            contentColor = LightBlue,
+            disabledContainerColor = containerColor,
+            disabledContentColor = LightBlue,
         ),
         shape = RoundedCornerShape(4.dp),
-        border = BorderStroke(2.dp, CardBorderBlue),
+        border = BorderStroke(2.dp, borderColor),
         onClick = { onClick() },
+        enabled = enabled
     ) {
         Text(
             modifier = Modifier.padding(4.dp),

@@ -1,6 +1,5 @@
 package com.vdovenko.triviaquiz.presentation.game
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,7 +21,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -32,9 +30,11 @@ import com.vdovenko.triviaquiz.getApplicationComponent
 import com.vdovenko.triviaquiz.ui.theme.AccentBlue
 import com.vdovenko.triviaquiz.ui.theme.AccentGreen
 import com.vdovenko.triviaquiz.ui.theme.AnswerButton
-import com.vdovenko.triviaquiz.ui.theme.ExtraDarkBlue
+import com.vdovenko.triviaquiz.ui.theme.CardBorderGreen
+import com.vdovenko.triviaquiz.ui.theme.CardBorderRed
+import com.vdovenko.triviaquiz.ui.theme.CardGreen
+import com.vdovenko.triviaquiz.ui.theme.CardRed
 import com.vdovenko.triviaquiz.ui.theme.LightBlue
-import com.vdovenko.triviaquiz.ui.theme.TriviaQuizTheme
 import com.vdovenko.triviaquiz.ui.theme.bungeeFont
 
 @Composable
@@ -70,53 +70,21 @@ fun GameScreen(
 
             is GameScreenState.ShowQuestion -> {
                 ShowQuestion(
-                    modifier = modifier,
                     question = currentState.question,
-                    onAnswerClick = { viewModel.countAnswer(it) }
+                    onAnswerClick = { answer, index -> viewModel.checkAnswer(answer, index) }
+                )
+            }
+
+            is GameScreenState.ShowAnswer -> {
+                ShowAnswer(
+                    question = currentState.question,
+                    answerIndex = currentState.answerIndex,
+                    correctIndex = currentState.correctIndex
                 )
             }
 
             is GameScreenState.ErrorScreen -> {
                 Text(currentState.error)
-            }
-        }
-    }
-}
-
-@Composable
-private fun ShowQuestion(
-    modifier: Modifier = Modifier,
-    question: Question,
-    onAnswerClick: (Answer) -> Unit
-) {
-    Column(
-        modifier = modifier.fillMaxSize()
-    ) {
-
-        //Question
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = question.question,
-                textAlign = TextAlign.Center
-            )
-        }
-
-        //Answers
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            question.answers.forEach { answer ->
-                AnswerButton(
-                    text = answer.text,
-                    onClick = { onAnswerClick(answer) })
             }
         }
     }
@@ -163,66 +131,129 @@ private fun GameHeader(
     }
 }
 
-@Preview
 @Composable
-private fun PreviewShowQuestion() {
-    TriviaQuizTheme {
+private fun ShowQuestion(
+    modifier: Modifier = Modifier,
+    question: Question,
+    onAnswerClick: (Answer, Int) -> Unit
+) {
+    Column(
+        modifier = modifier.fillMaxSize()
+    ) {
+
+        //Question
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .background(ExtraDarkBlue)
+                .fillMaxWidth()
+                .weight(1f),
+            contentAlignment = Alignment.Center,
         ) {
-            ShowQuestion(
-                question = Question(
-                    question = "//Question",
-                    answers = listOf(
-                        Answer("Answer 1", false),
-                        Answer("Answer 2", false),
-                        Answer("Answer 3", true),
-                        Answer("Answer 4", false)
-                    )
-                ),
-                    onAnswerClick = { }
-                )
+            Text(
+                text = question.question,
+                textAlign = TextAlign.Center
+            )
+        }
+
+        //Answers
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            question.answers.forEachIndexed { index, answer ->
+                AnswerButton(
+                    text = answer.text,
+                    onClick = { onAnswerClick(answer, index) })
+            }
         }
     }
 }
 
-//        Column(
+@Composable
+private fun ShowAnswer(
+    modifier: Modifier = Modifier,
+    question: Question,
+    answerIndex: Int,
+    correctIndex: Int
+) {
+    Column(
+        modifier = modifier.fillMaxSize()
+    ) {
+
+        //Question
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = question.question,
+                textAlign = TextAlign.Center
+            )
+        }
+
+        //Answers
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            question.answers.forEachIndexed { index, answer ->
+
+                if (index == correctIndex) {
+                    val containerColor = CardGreen
+                    val borderColor = CardBorderGreen
+                    AnswerButton(
+                        text = answer.text,
+                        containerColor = containerColor,
+                        borderColor = borderColor,
+                        onClick = { },
+                        enabled = false)
+                } else if (correctIndex != answerIndex && index == answerIndex) {
+                    val containerColor = CardRed
+                    val borderColor = CardBorderRed
+                    AnswerButton(
+                        text = answer.text,
+                        containerColor = containerColor,
+                        borderColor = borderColor,
+                        onClick = { },
+                        enabled = false)
+                } else {
+                    AnswerButton(
+                        text = answer.text,
+                        onClick = { },
+                        enabled = false)
+                }
+            }
+        }
+    }
+}
+
+
+//@Preview
+//@Composable
+//private fun PreviewShowQuestion() {
+//    TriviaQuizTheme {
+//        Box(
 //            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(12.dp)
-//                .height(204.dp),
-//            verticalArrangement = Arrangement.spacedBy(4.dp)
+//                .fillMaxSize()
+//                .background(ExtraDarkBlue)
 //        ) {
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .weight(1f),
-//                horizontalArrangement = Arrangement.spacedBy(4.dp)
-//            ) {
-//                AnswerButton(
-//                    modifier = Modifier.weight(1f),
-//                    text = "Answer 1"
-//                )
-//                AnswerButton(
-//                    modifier = Modifier.weight(1f),
-//                    text = "Answer 2"
-//                )
-//            }
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .weight(1f),
-//                horizontalArrangement = Arrangement.spacedBy(4.dp)
-//            ) {
-//                AnswerButton(
-//                    modifier = Modifier.weight(1f),
-//                    text = "Answer 3"
-//                )
-//                AnswerButton(
-//                    modifier = Modifier.weight(1f),
-//                    text = "Answer 4"
-//                )
-//            }
+//            ShowQuestion(
+//                question = Question(
+//                    question = "//Question",
+//                    answers = listOf(
+//                        Answer("Answer 1", false),
+//                        Answer("Answer 2", false),
+//                        Answer("Answer 3", true),
+//                        Answer("Answer 4", false)
+//                    )
+//                ),
+//                onAnswerClick = {  }
+//            )
 //        }
+//    }
+//}

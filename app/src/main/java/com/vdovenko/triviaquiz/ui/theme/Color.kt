@@ -17,3 +17,8 @@ val AccentBlue = Color(0xFF6186FF)
 val LightBlue = Color(0xFFDBE3FF)
 
 val AccentGreen = Color(0xFF64FF61)
+val CardGreen = Color(0xFF163823)
+val CardBorderGreen = Color(0xFF54D755)
+
+val CardRed = Color(0xFF350A1D)
+val CardBorderRed = Color(0xFFD7183E)

@@ -104,7 +104,16 @@ class GameViewModel @Inject constructor(
         }
     }
 
-    fun countAnswer(answer: Answer) {
+    fun checkAnswer(answer: Answer, answerIndex: Int) {
+
+        val question = (_screenState.value as GameScreenState.ShowQuestion).question
+        val correctIndex = question.answers.indexOfFirst { it.isCorrect }
+        _screenState.value = GameScreenState.ShowAnswer(
+            question = question,
+            answerIndex = answerIndex,
+            correctIndex = correctIndex
+        )
+
         if (answer.isCorrect) {
             _correctAnswers.value++
         }
