@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ExitToApp
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -30,6 +31,7 @@ import com.vdovenko.triviaquiz.getApplicationComponent
 import com.vdovenko.triviaquiz.ui.theme.AccentBlue
 import com.vdovenko.triviaquiz.ui.theme.AccentGreen
 import com.vdovenko.triviaquiz.ui.theme.AnswerButton
+import com.vdovenko.triviaquiz.ui.theme.CardBlue
 import com.vdovenko.triviaquiz.ui.theme.CardBorderGreen
 import com.vdovenko.triviaquiz.ui.theme.CardBorderRed
 import com.vdovenko.triviaquiz.ui.theme.CardGreen
@@ -50,8 +52,7 @@ fun GameScreen(
     val correctAnswers by viewModel.correctAnswer.collectAsState()
 
     Column(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        modifier = modifier.fillMaxSize()
     ) {
 
         GameHeader(
@@ -65,7 +66,17 @@ fun GameScreen(
             }
 
             GameScreenState.Loading -> {
-                Text("Loading")
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center),
+                        color = CardBlue,
+                        trackColor = AccentBlue
+                    )
+                }
+
             }
 
             is GameScreenState.ShowQuestion -> {
@@ -144,6 +155,7 @@ private fun ShowQuestion(
         //Question
         Box(
             modifier = Modifier
+                .padding(16.dp)
                 .fillMaxWidth()
                 .weight(1f),
             contentAlignment = Alignment.Center,
@@ -184,6 +196,7 @@ private fun ShowAnswer(
         //Question
         Box(
             modifier = Modifier
+                .padding(16.dp)
                 .fillMaxWidth()
                 .weight(1f),
             contentAlignment = Alignment.Center,
@@ -231,29 +244,3 @@ private fun ShowAnswer(
         }
     }
 }
-
-
-//@Preview
-//@Composable
-//private fun PreviewShowQuestion() {
-//    TriviaQuizTheme {
-//        Box(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .background(ExtraDarkBlue)
-//        ) {
-//            ShowQuestion(
-//                question = Question(
-//                    question = "//Question",
-//                    answers = listOf(
-//                        Answer("Answer 1", false),
-//                        Answer("Answer 2", false),
-//                        Answer("Answer 3", true),
-//                        Answer("Answer 4", false)
-//                    )
-//                ),
-//                onAnswerClick = {  }
-//            )
-//        }
-//    }
-//}

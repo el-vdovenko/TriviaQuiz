@@ -17,23 +17,25 @@ class GameViewModel @Inject constructor(
     private val getQuestionsUseCase: GetQuestionsUseCase
 ) : ViewModel() {
 
-    private val _questionsStorage = MutableStateFlow<List<Question>>(emptyList())
-
-    private val _currentIndex = MutableStateFlow(0)
-
     private val _screenState: MutableStateFlow<GameScreenState> =
         MutableStateFlow(GameScreenState.Initial)
     val screenState: StateFlow<GameScreenState> = _screenState
-
-    private var _isLoadingQuestions: Boolean = false
-
-    private var _retryCount = 0
 
     private val _correctAnswers = MutableStateFlow(0)
     val correctAnswer: StateFlow<Int> = _correctAnswers
 
     private val _totalQuestions = MutableStateFlow(0)
     val totalQuestions: MutableStateFlow<Int> = _totalQuestions
+
+
+    private val _questionsStorage = MutableStateFlow<List<Question>>(emptyList())
+
+    private val _currentIndex = MutableStateFlow(0)
+
+    private var _isLoadingQuestions: Boolean = false
+
+    private var _retryCount = 0
+
 
     init {
         _screenState.value = GameScreenState.Loading

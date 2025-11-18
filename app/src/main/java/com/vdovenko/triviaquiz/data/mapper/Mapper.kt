@@ -12,7 +12,7 @@ fun QuestionDTO.toEntity(): Question {
     answers.add(stringToAnswer(convertText(this.correctAnswer), true))
     answers.shuffle()
     return Question(
-        question = question,
+        question = convertText(question),
         answers = answers
     )
 }
