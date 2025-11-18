@@ -1,22 +1,19 @@
 package com.vdovenko.triviaquiz.data.repository
 
-import com.vdovenko.triviaquiz.domain.entities.Resource
 import com.vdovenko.triviaquiz.data.mapper.toEntity
 import com.vdovenko.triviaquiz.data.network.api.ApiService
 import com.vdovenko.triviaquiz.domain.entities.Category
 import com.vdovenko.triviaquiz.domain.entities.DataError
 import com.vdovenko.triviaquiz.domain.entities.Question
+import com.vdovenko.triviaquiz.domain.entities.Resource
 import com.vdovenko.triviaquiz.domain.repository.Repository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
-import javax.inject.Inject
 
-class RepositoryImpl @Inject constructor(
-    private val apiService: ApiService
-) : Repository {
+class RepositoryImpl(private val apiService: ApiService) : Repository {
 
     override suspend fun getCategories(): Resource<List<Category>, DataError> {
 

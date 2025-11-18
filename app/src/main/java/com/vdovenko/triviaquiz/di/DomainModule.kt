@@ -1,4 +1,4 @@
-package com.vdovenko.triviaquiz.di.koin
+package com.vdovenko.triviaquiz.di
 
 import com.vdovenko.triviaquiz.domain.usecases.GetCategoriesUseCase
 import com.vdovenko.triviaquiz.domain.usecases.GetQuestionsUseCase

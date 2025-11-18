@@ -24,10 +24,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vdovenko.triviaquiz.domain.entities.Answer
 import com.vdovenko.triviaquiz.domain.entities.Question
-import com.vdovenko.triviaquiz.getApplicationComponent
 import com.vdovenko.triviaquiz.ui.theme.AccentBlue
 import com.vdovenko.triviaquiz.ui.theme.AccentGreen
 import com.vdovenko.triviaquiz.ui.theme.AnswerButton
@@ -38,14 +36,14 @@ import com.vdovenko.triviaquiz.ui.theme.CardGreen
 import com.vdovenko.triviaquiz.ui.theme.CardRed
 import com.vdovenko.triviaquiz.ui.theme.LightBlue
 import com.vdovenko.triviaquiz.ui.theme.bungeeFont
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun GameScreen(
     modifier: Modifier = Modifier
 ) {
 
-    val component = getApplicationComponent()
-    val viewModel: GameViewModel = viewModel(factory = component.getViewModelFactory())
+    val viewModel: GameViewModel = koinViewModel()
 
     val screenState by viewModel.screenState.collectAsState()
     val totalQuestions by viewModel.totalQuestions.collectAsState()

@@ -11,11 +11,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-class GameViewModel @Inject constructor(
-    private val getQuestionsUseCase: GetQuestionsUseCase
-) : ViewModel() {
+class GameViewModel (private val getQuestionsUseCase: GetQuestionsUseCase) : ViewModel() {
 
     private val _screenState: MutableStateFlow<GameScreenState> =
         MutableStateFlow(GameScreenState.Initial)

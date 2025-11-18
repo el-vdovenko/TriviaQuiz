@@ -1,19 +1,22 @@
 package com.vdovenko.triviaquiz
 
 import android.app.Application
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
-import com.vdovenko.triviaquiz.di.dagger.ApplicationComponent
-import com.vdovenko.triviaquiz.di.dagger.DaggerApplicationComponent
+import com.vdovenko.triviaquiz.di.applicationModule
+import com.vdovenko.triviaquiz.di.dataModule
+import com.vdovenko.triviaquiz.di.domainModule
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
+import org.koin.core.logger.Level
 
 class TriviaQuizApp: Application() {
+    override fun onCreate() {
+        super.onCreate()
 
-    val component: ApplicationComponent by lazy {
-        DaggerApplicationComponent.create()
+        startKoin {
+            androidLogger(Level.DEBUG)
+            androidContext(this@TriviaQuizApp)
+            modules(listOf(applicationModule, dataModule, domainModule))
+        }
     }
-}
-
-@Composable
-fun getApplicationComponent(): ApplicationComponent {
-    return (LocalContext.current.applicationContext as TriviaQuizApp).component
 }

@@ -1,4 +1,4 @@
-package com.vdovenko.triviaquiz.di.koin
+package com.vdovenko.triviaquiz.di
 
 import com.vdovenko.triviaquiz.data.network.api.ApiFactory
 import com.vdovenko.triviaquiz.data.network.api.ApiService

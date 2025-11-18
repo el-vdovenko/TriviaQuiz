@@ -1,4 +1,4 @@
-package com.vdovenko.triviaquiz.di.koin
+package com.vdovenko.triviaquiz.di
 
 import com.vdovenko.triviaquiz.presentation.game.GameViewModel
 import org.koin.core.module.dsl.viewModelOf
