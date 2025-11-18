@@ -25,25 +25,30 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vdovenko.triviaquiz.domain.entities.Answer
+import com.vdovenko.triviaquiz.domain.entities.Category
 import com.vdovenko.triviaquiz.domain.entities.Question
-import com.vdovenko.triviaquiz.ui.theme.AccentBlue
-import com.vdovenko.triviaquiz.ui.theme.AccentGreen
 import com.vdovenko.triviaquiz.ui.theme.AnswerButton
-import com.vdovenko.triviaquiz.ui.theme.CardBlue
-import com.vdovenko.triviaquiz.ui.theme.CardBorderGreen
-import com.vdovenko.triviaquiz.ui.theme.CardBorderRed
-import com.vdovenko.triviaquiz.ui.theme.CardGreen
-import com.vdovenko.triviaquiz.ui.theme.CardRed
-import com.vdovenko.triviaquiz.ui.theme.LightBlue
+import com.vdovenko.triviaquiz.ui.theme.BlueAccent
+import com.vdovenko.triviaquiz.ui.theme.BlueCard
+import com.vdovenko.triviaquiz.ui.theme.BlueLight
+import com.vdovenko.triviaquiz.ui.theme.GreenAccent
+import com.vdovenko.triviaquiz.ui.theme.GreenCard
+import com.vdovenko.triviaquiz.ui.theme.GreenCardBorder
+import com.vdovenko.triviaquiz.ui.theme.GreenLight
+import com.vdovenko.triviaquiz.ui.theme.RedCard
+import com.vdovenko.triviaquiz.ui.theme.RedCardBorder
+import com.vdovenko.triviaquiz.ui.theme.RedLight
 import com.vdovenko.triviaquiz.ui.theme.bungeeFont
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun GameScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    selectCategoryId: Int
 ) {
 
-    val viewModel: GameViewModel = koinViewModel()
+    val viewModel: GameViewModel = koinViewModel { parametersOf(selectCategoryId) }
 
     val screenState by viewModel.screenState.collectAsState()
     val totalQuestions by viewModel.totalQuestions.collectAsState()
@@ -70,8 +75,8 @@ fun GameScreen(
                 ) {
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center),
-                        color = CardBlue,
-                        trackColor = AccentBlue
+                        color = BlueCard,
+                        trackColor = BlueAccent
                     )
                 }
 
@@ -92,7 +97,7 @@ fun GameScreen(
                 )
             }
 
-            is GameScreenState.ErrorScreen -> {
+            is GameScreenState.Error -> {
                 Text(currentState.error)
             }
         }
@@ -116,22 +121,22 @@ private fun GameHeader(
             Icon(
                 imageVector = Icons.AutoMirrored.Rounded.ExitToApp,
                 contentDescription = null,
-                tint = AccentBlue
+                tint = BlueAccent
             )
         }
         Text(
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.Center,
-            color = LightBlue,
+            color = BlueLight,
             fontFamily = bungeeFont,
             text = "Question $totalQuestions"
         )
         Text(
             fontFamily = bungeeFont,
-            color = LightBlue,
+            color = BlueLight,
             fontSize = 16.sp,
             text = buildAnnotatedString {
-                withStyle(style = SpanStyle(color = AccentGreen)) {
+                withStyle(style = SpanStyle(color = GreenAccent)) {
                     append(correctAnswer.toString())
                 }
                 append("/$totalQuestions")
@@ -215,21 +220,19 @@ private fun ShowAnswer(
             question.answers.forEachIndexed { index, answer ->
 
                 if (index == correctIndex) {
-                    val containerColor = CardGreen
-                    val borderColor = CardBorderGreen
                     AnswerButton(
                         text = answer.text,
-                        containerColor = containerColor,
-                        borderColor = borderColor,
+                        containerColor = GreenCard,
+                        borderColor = GreenCardBorder,
+                        textColor = GreenLight,
                         onClick = { },
                         enabled = false)
                 } else if (correctIndex != answerIndex && index == answerIndex) {
-                    val containerColor = CardRed
-                    val borderColor = CardBorderRed
                     AnswerButton(
                         text = answer.text,
-                        containerColor = containerColor,
-                        borderColor = borderColor,
+                        containerColor = RedCard,
+                        borderColor = RedCardBorder,
+                        textColor = RedLight,
                         onClick = { },
                         enabled = false)
                 } else {

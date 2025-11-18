@@ -3,6 +3,7 @@ package com.vdovenko.triviaquiz.presentation.game
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vdovenko.triviaquiz.domain.entities.Answer
+import com.vdovenko.triviaquiz.domain.entities.Category
 import com.vdovenko.triviaquiz.domain.entities.DataError
 import com.vdovenko.triviaquiz.domain.entities.Question
 import com.vdovenko.triviaquiz.domain.entities.Resource
@@ -12,7 +13,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class GameViewModel (private val getQuestionsUseCase: GetQuestionsUseCase) : ViewModel() {
+class GameViewModel(
+    private val getQuestionsUseCase: GetQuestionsUseCase,
+    private val selectedCategoryId: Int
+) : ViewModel() {
 
     private val _screenState: MutableStateFlow<GameScreenState> =
         MutableStateFlow(GameScreenState.Initial)
@@ -50,7 +54,7 @@ class GameViewModel (private val getQuestionsUseCase: GetQuestionsUseCase) : Vie
         viewModelScope.launch {
 
             val result = getQuestionsUseCase(
-                categoryId = 11,
+                categoryId = selectedCategoryId,
                 difficulty = "medium",
                 amount = QUESTIONS_LOAD_AMOUNT
             )
@@ -73,9 +77,10 @@ class GameViewModel (private val getQuestionsUseCase: GetQuestionsUseCase) : Vie
                             retryLoad()
                             return@launch
                         }
+
                         else -> {
                             _screenState.value =
-                                GameScreenState.ErrorScreen("${result.error} ${result.message}")
+                                GameScreenState.Error("${result.error} ${result.message}")
                         }
                     }
                 }
@@ -124,7 +129,7 @@ class GameViewModel (private val getQuestionsUseCase: GetQuestionsUseCase) : Vie
 
     private suspend fun retryLoad() {
         if (_retryCount == 2) {
-            _screenState.value = GameScreenState.ErrorScreen("")
+            _screenState.value = GameScreenState.Error("")
             _retryCount = 0
             return
         }

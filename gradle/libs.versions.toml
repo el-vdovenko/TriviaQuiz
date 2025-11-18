@@ -13,6 +13,7 @@ navigationCompose = "2.9.6"
 retrofit = "3.0.0"
 dagger = "2.57.2"
 ksp = "2.2.0-2.0.2"
+serialization = "1.9.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -35,12 +36,13 @@ koin-compose = { group = "io.insert-koin", name="koin-androidx-compose", version
 koin-core = { group = "io.insert-koin", name="koin-core", version.ref = "koin" }
 retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-gsonConverter = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
-dagger-core = { group= "com.google.dagger", name = "dagger", version.ref = "dagger" }
-dagger-compiler = { group= "com.google.dagger", name = "dagger-compiler", version.ref = "dagger" }
+dagger-core = { group = "com.google.dagger", name = "dagger", version.ref = "dagger" }
+dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "dagger" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+serialization = {id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "serialization"}
 

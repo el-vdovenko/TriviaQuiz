@@ -55,7 +55,7 @@ val TriviaQuizTypography = Typography(
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp,
-        color = LightBlue
+        color = BlueLight
     ),
     labelLarge = TextStyle(
         fontFamily = rubikSansFamily,
@@ -63,6 +63,27 @@ val TriviaQuizTypography = Typography(
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp,
-        color = LightBlue
+        color = BlueLight
+    ),
+    titleSmall = TextStyle(
+        fontFamily = bungeeFont,
+        fontWeight = FontWeight.Normal,
+        fontSize = 14.sp,
+        lineHeight = 17.sp,
+        color = BlueLight
+    ),
+    titleMedium = TextStyle(
+        fontFamily = bungeeFont,
+        fontWeight = FontWeight.Normal,
+        fontSize = 20.sp,
+        lineHeight = 24.sp,
+        color = BlueLight
+    ),
+    titleLarge = TextStyle(
+        fontFamily = bungeeShadeFont,
+        fontWeight = FontWeight.Normal,
+        fontSize = 36.sp,
+        lineHeight = 44.sp,
+        color = BlueAccent
     )
 )

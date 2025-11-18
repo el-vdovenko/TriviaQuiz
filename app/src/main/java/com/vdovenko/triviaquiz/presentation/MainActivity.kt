@@ -9,8 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.vdovenko.triviaquiz.presentation.game.GameScreen
-import com.vdovenko.triviaquiz.ui.theme.ExtraDarkBlue
+import com.vdovenko.triviaquiz.ui.theme.BlueExtraDark
 import com.vdovenko.triviaquiz.ui.theme.TriviaQuizTheme
 
 class MainActivity : ComponentActivity() {
@@ -24,13 +23,11 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(ExtraDarkBlue)
+                        .background(BlueExtraDark)
                 ) { innerPadding ->
-                    GameScreen(modifier = Modifier.padding(innerPadding))
+                    MainScreen(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
     }
 }
-
-//val question = HtmlCompat.fromHtml(questionComp.question, HtmlCompat.FROM_HTML_MODE_LEGACY).toString()
