@@ -1,5 +1,9 @@
 package com.vdovenko.triviaquiz.presentation.game
 
+import androidx.compose.animation.Animatable
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,8 +18,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.SpanStyle
@@ -25,11 +31,11 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vdovenko.triviaquiz.domain.entities.Answer
-import com.vdovenko.triviaquiz.domain.entities.Category
 import com.vdovenko.triviaquiz.domain.entities.Question
 import com.vdovenko.triviaquiz.ui.theme.AnswerButton
 import com.vdovenko.triviaquiz.ui.theme.BlueAccent
 import com.vdovenko.triviaquiz.ui.theme.BlueCard
+import com.vdovenko.triviaquiz.ui.theme.BlueCardBorder
 import com.vdovenko.triviaquiz.ui.theme.BlueLight
 import com.vdovenko.triviaquiz.ui.theme.GreenAccent
 import com.vdovenko.triviaquiz.ui.theme.GreenCard
@@ -192,6 +198,18 @@ private fun ShowAnswer(
     answerIndex: Int,
     correctIndex: Int
 ) {
+
+    val correctColor = remember { Animatable(BlueCardBorder) }
+    LaunchedEffect(Unit) {
+        correctColor.animateTo(
+            targetValue = GreenCardBorder,
+            animationSpec = infiniteRepeatable(
+                animation = tween(200),
+                repeatMode = RepeatMode.Reverse
+            )
+        )
+    }
+
     Column(
         modifier = modifier.fillMaxSize()
     ) {
@@ -223,7 +241,7 @@ private fun ShowAnswer(
                     AnswerButton(
                         text = answer.text,
                         containerColor = GreenCard,
-                        borderColor = GreenCardBorder,
+                        borderColor = correctColor.value,
                         textColor = GreenLight,
                         onClick = { },
                         enabled = false)

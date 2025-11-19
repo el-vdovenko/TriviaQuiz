@@ -3,7 +3,6 @@ package com.vdovenko.triviaquiz.presentation.game
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vdovenko.triviaquiz.domain.entities.Answer
-import com.vdovenko.triviaquiz.domain.entities.Category
 import com.vdovenko.triviaquiz.domain.entities.DataError
 import com.vdovenko.triviaquiz.domain.entities.Question
 import com.vdovenko.triviaquiz.domain.entities.Resource
@@ -142,6 +141,6 @@ class GameViewModel(
 
         private const val QUESTIONS_LOAD_AMOUNT = 20
         private const val RETRY_DELAY = 5000L
-        private const val DELAY_FOR_NEXT_QUESTION = 1000L
+        private const val DELAY_FOR_NEXT_QUESTION = 1500L
     }
 }
