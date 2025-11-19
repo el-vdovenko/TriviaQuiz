@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 
 class GameViewModel(
     private val getQuestionsUseCase: GetQuestionsUseCase,
-    private val selectedCategoryId: Int
+    private val selectedCategoryId: Int?
 ) : ViewModel() {
 
     private val _screenState: MutableStateFlow<GameScreenState> =

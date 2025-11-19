@@ -26,7 +26,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun SelectCategoryScreen(
     modifier: Modifier = Modifier,
-    onClickCategory: (Int) -> Unit
+    onClickCategory: (Int?) -> Unit
 ) {
 
     val viewModel: SelectCategoryViewModel = koinViewModel()
@@ -73,7 +73,7 @@ fun SelectCategoryScreen(
 fun SelectCategory(
     modifier: Modifier = Modifier,
     categories: List<Category>,
-    onClickCategory: (Int) -> Unit
+    onClickCategory: (Int?) -> Unit
 ) {
     Column(
         modifier = modifier
@@ -91,7 +91,7 @@ fun SelectCategory(
             item {
                 CategoryAnswer(
                     text = "All",
-                    onClick = { }
+                    onClick = { onClickCategory(null) }
                 )
             }
             items(items = categories, key = { it.id }) {

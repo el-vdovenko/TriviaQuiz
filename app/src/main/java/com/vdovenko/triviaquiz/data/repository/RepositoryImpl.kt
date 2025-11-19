@@ -34,7 +34,7 @@ class RepositoryImpl(private val apiService: ApiService) : Repository {
 
     override suspend fun getQuestions(
         sessionToken: String?,
-        categoryId: Int,
+        categoryId: Int?,
         difficulty: String,
         amount: Int
     ): Resource<List<Question>, DataError> {

@@ -9,9 +9,7 @@ import org.koin.dsl.module
 
 val applicationModule = module {
 
-//    viewModelOf(::GameViewModel)
-
     viewModelOf(::SelectCategoryViewModel)
 
-    viewModel { parameters -> GameViewModel(get(), selectedCategoryId = parameters.get()) }
+    viewModel { parameters -> GameViewModel(get(), selectedCategoryId = parameters.getOrNull()) }
 }

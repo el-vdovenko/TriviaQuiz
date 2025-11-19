@@ -6,7 +6,7 @@ class GetQuestionsUseCase (private val repository: Repository) {
 
     suspend operator fun invoke(
         sessionToken: String? = null,
-        categoryId: Int,
+        categoryId: Int?,
         difficulty: String,
         amount: Int
     ) =

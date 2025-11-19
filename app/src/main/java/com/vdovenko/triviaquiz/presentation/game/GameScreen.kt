@@ -51,7 +51,7 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun GameScreen(
     modifier: Modifier = Modifier,
-    selectCategoryId: Int
+    selectCategoryId: Int?
 ) {
 
     val viewModel: GameViewModel = koinViewModel { parametersOf(selectCategoryId) }

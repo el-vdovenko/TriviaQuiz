@@ -47,5 +47,5 @@ sealed interface Screen {
     data object SelectCategory : Screen
 
     @Serializable
-    data class Game(val selectedCategoryId: Int) : Screen
+    data class Game(val selectedCategoryId: Int?) : Screen
 }
