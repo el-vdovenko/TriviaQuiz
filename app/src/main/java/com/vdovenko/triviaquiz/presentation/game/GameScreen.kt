@@ -126,6 +126,7 @@ fun GameScreen(
                     result = currentState.result,
                     totalQuestions = totalQuestions,
                     correctAnswers = correctAnswers,
+                    isGood = currentState.isGood,
                     onTryAgainClick = onTryAgainClick
                 )
             }
@@ -289,6 +290,7 @@ private fun Result(
     result: Int,
     totalQuestions: Int,
     correctAnswers: Int,
+    isGood: Boolean,
     onTryAgainClick: () -> Unit
 ) {
     Column(
@@ -296,6 +298,7 @@ private fun Result(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        val resultColor = if (isGood) GreenAccent else RedAccent
         Text(
             fontFamily = bungeeFont,
             fontSize = 22.sp,
@@ -305,7 +308,7 @@ private fun Result(
         Text(
             fontFamily = bungeeFont,
             fontSize = 22.sp,
-            color = GreenAccent,
+            color = resultColor,
             text = "$result%"
         )
         Spacer(modifier = Modifier.height(24.dp))
@@ -358,6 +361,8 @@ private fun Result(
     }
 }
 
+
+// Inners Components
 @Composable
 private fun Question(
     modifier: Modifier = Modifier,
@@ -374,20 +379,5 @@ private fun Question(
             textAlign = TextAlign.Center,
             color = BlueLight
         )
-    }
-}
-
-@Preview
-@Composable
-private fun PreviewResult() {
-    TriviaQuizTheme {
-        Surface(modifier = Modifier.background(BlueExtraDark)) {
-            Result(
-                result = 75,
-                totalQuestions = 15,
-                correctAnswers = 11,
-                onTryAgainClick = {}
-            )
-        }
     }
 }

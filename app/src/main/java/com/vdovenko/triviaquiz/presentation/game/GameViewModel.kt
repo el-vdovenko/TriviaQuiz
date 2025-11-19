@@ -131,7 +131,8 @@ class GameViewModel(
         val result =
             if (_correctAnswers.value == 0) 0
             else ((_totalQuestions.value / _correctAnswers.value) * 100).coerceAtMost(100)
-        _screenState.value = GameScreenState.Result(result)
+        val isGood = result >= 50
+        _screenState.value = GameScreenState.Result(result, isGood)
     }
 
     private suspend fun retryLoad() {
