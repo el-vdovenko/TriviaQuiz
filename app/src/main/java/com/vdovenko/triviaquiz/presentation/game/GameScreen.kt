@@ -4,30 +4,39 @@ import androidx.compose.animation.Animatable
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ExitToApp
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vdovenko.triviaquiz.domain.entities.Answer
@@ -36,14 +45,17 @@ import com.vdovenko.triviaquiz.ui.theme.AnswerButton
 import com.vdovenko.triviaquiz.ui.theme.BlueAccent
 import com.vdovenko.triviaquiz.ui.theme.BlueCard
 import com.vdovenko.triviaquiz.ui.theme.BlueCardBorder
+import com.vdovenko.triviaquiz.ui.theme.BlueExtraDark
 import com.vdovenko.triviaquiz.ui.theme.BlueLight
 import com.vdovenko.triviaquiz.ui.theme.GreenAccent
 import com.vdovenko.triviaquiz.ui.theme.GreenCard
 import com.vdovenko.triviaquiz.ui.theme.GreenCardBorder
 import com.vdovenko.triviaquiz.ui.theme.GreenLight
+import com.vdovenko.triviaquiz.ui.theme.RedAccent
 import com.vdovenko.triviaquiz.ui.theme.RedCard
 import com.vdovenko.triviaquiz.ui.theme.RedCardBorder
 import com.vdovenko.triviaquiz.ui.theme.RedLight
+import com.vdovenko.triviaquiz.ui.theme.TriviaQuizTheme
 import com.vdovenko.triviaquiz.ui.theme.bungeeFont
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -51,22 +63,27 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun GameScreen(
     modifier: Modifier = Modifier,
-    selectCategoryId: Int?
+    selectCategoryId: Int?,
+    onTryAgainClick: () -> Unit
 ) {
 
     val viewModel: GameViewModel = koinViewModel { parametersOf(selectCategoryId) }
 
     val screenState by viewModel.screenState.collectAsState()
     val totalQuestions by viewModel.totalQuestions.collectAsState()
-    val correctAnswers by viewModel.correctAnswer.collectAsState()
+    val correctAnswers by viewModel.correctAnswers.collectAsState()
+
+    var alphaHeader by remember { mutableStateOf(1f) }
 
     Column(
         modifier = modifier.fillMaxSize()
     ) {
 
         GameHeader(
-            correctAnswer = correctAnswers,
-            totalQuestions = totalQuestions
+            correctAnswers = correctAnswers,
+            totalQuestions = totalQuestions,
+            onEndClick = { viewModel.endGame() },
+            alpha = alphaHeader
         )
 
         when (val currentState = screenState) {
@@ -103,6 +120,16 @@ fun GameScreen(
                 )
             }
 
+            is GameScreenState.Result -> {
+                alphaHeader = 0f
+                Result(
+                    result = currentState.result,
+                    totalQuestions = totalQuestions,
+                    correctAnswers = correctAnswers,
+                    onTryAgainClick = onTryAgainClick
+                )
+            }
+
             is GameScreenState.Error -> {
                 Text(currentState.error)
             }
@@ -112,42 +139,42 @@ fun GameScreen(
 
 @Composable
 private fun GameHeader(
-    correctAnswer: Int,
-    totalQuestions: Int
+    correctAnswers: Int,
+    totalQuestions: Int,
+    onEndClick: () -> Unit,
+    alpha: Float
 ) {
     Row(
         modifier = Modifier
-            .padding(8.dp, 32.dp, 16.dp)
+            .padding(20.dp, 32.dp, 8.dp)
+            .alpha(alpha)
             .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        IconButton(
-            onClick = {}
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Rounded.ExitToApp,
-                contentDescription = null,
-                tint = BlueAccent
-            )
-        }
-        Text(
-            modifier = Modifier.weight(1f),
-            textAlign = TextAlign.Center,
-            color = BlueLight,
-            fontFamily = bungeeFont,
-            text = "Question $totalQuestions"
-        )
         Text(
             fontFamily = bungeeFont,
             color = BlueLight,
             fontSize = 16.sp,
             text = buildAnnotatedString {
+                append("Result ")
                 withStyle(style = SpanStyle(color = GreenAccent)) {
-                    append(correctAnswer.toString())
+                    append(correctAnswers.toString())
                 }
                 append("/$totalQuestions")
             }
         )
+        TextButton(
+            onClick = { onEndClick() },
+            colors = ButtonDefaults.textButtonColors().copy(
+                contentColor = RedAccent
+            )
+        ) {
+            Text(
+                fontFamily = bungeeFont,
+                text = "End game"
+            )
+        }
     }
 }
 
@@ -162,18 +189,10 @@ private fun ShowQuestion(
     ) {
 
         //Question
-        Box(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth()
-                .weight(1f),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = question.question,
-                textAlign = TextAlign.Center
-            )
-        }
+        Question(
+            modifier = Modifier.weight(1f),
+            text = question.question
+        )
 
         //Answers
         Column(
@@ -200,6 +219,7 @@ private fun ShowAnswer(
 ) {
 
     val correctColor = remember { Animatable(BlueCardBorder) }
+    val incorrectColor = remember { Animatable(BlueCardBorder) }
     LaunchedEffect(Unit) {
         correctColor.animateTo(
             targetValue = GreenCardBorder,
@@ -210,23 +230,22 @@ private fun ShowAnswer(
         )
     }
 
+    LaunchedEffect(Unit) {
+        incorrectColor.animateTo(
+            targetValue = RedCardBorder,
+            animationSpec = tween(200)
+        )
+    }
+
     Column(
         modifier = modifier.fillMaxSize()
     ) {
 
         //Question
-        Box(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth()
-                .weight(1f),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = question.question,
-                textAlign = TextAlign.Center
-            )
-        }
+        Question(
+            modifier = Modifier.weight(1f),
+            text = question.question
+        )
 
         //Answers
         Column(
@@ -249,7 +268,7 @@ private fun ShowAnswer(
                     AnswerButton(
                         text = answer.text,
                         containerColor = RedCard,
-                        borderColor = RedCardBorder,
+                        borderColor = incorrectColor.value,
                         textColor = RedLight,
                         onClick = { },
                         enabled = false)
@@ -260,6 +279,115 @@ private fun ShowAnswer(
                         enabled = false)
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun Result(
+    modifier: Modifier = Modifier,
+    result: Int,
+    totalQuestions: Int,
+    correctAnswers: Int,
+    onTryAgainClick: () -> Unit
+) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            fontFamily = bungeeFont,
+            fontSize = 22.sp,
+            color = Color.White,
+            text = "Your result:"
+        )
+        Text(
+            fontFamily = bungeeFont,
+            fontSize = 22.sp,
+            color = GreenAccent,
+            text = "$result%"
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+        Row(
+            modifier = Modifier
+                .padding(start = 32.dp, end = 40.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                color = BlueLight,
+                text = "Total questions:"
+            )
+            Text(
+                fontFamily = bungeeFont,
+                color = BlueLight,
+                text = "$totalQuestions"
+            )
+        }
+        Row(
+            modifier = Modifier
+                .padding(start = 32.dp, end = 40.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                color = BlueLight,
+                text = "Correct answers:"
+            )
+            Text(
+                fontFamily = bungeeFont,
+                color = BlueLight,
+                text = "$correctAnswers"
+            )
+        }
+        Spacer(modifier = Modifier.height(96.dp))
+        Button(
+            modifier = Modifier.width(188.dp),
+            colors = ButtonDefaults.buttonColors().copy(
+                containerColor = BlueAccent,
+                contentColor = Color.White
+            ),
+            onClick = { onTryAgainClick() }
+        ) {
+            Text(
+                fontFamily = bungeeFont,
+                text = "Play again"
+            )
+        }
+    }
+}
+
+@Composable
+private fun Question(
+    modifier: Modifier = Modifier,
+    text: String
+) {
+    Box(
+        modifier = modifier
+            .padding(20.dp)
+            .fillMaxWidth(),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = text,
+            textAlign = TextAlign.Center,
+            color = BlueLight
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewResult() {
+    TriviaQuizTheme {
+        Surface(modifier = Modifier.background(BlueExtraDark)) {
+            Result(
+                result = 75,
+                totalQuestions = 15,
+                correctAnswers = 11,
+                onTryAgainClick = {}
+            )
         }
     }
 }

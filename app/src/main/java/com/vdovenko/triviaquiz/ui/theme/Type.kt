@@ -54,16 +54,14 @@ val TriviaQuizTypography = Typography(
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 24.sp,
-        letterSpacing = 0.5.sp,
-        color = BlueLight
+        letterSpacing = 0.5.sp
     ),
     labelLarge = TextStyle(
         fontFamily = rubikSansFamily,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 24.sp,
-        letterSpacing = 0.5.sp,
-        color = BlueLight
+        letterSpacing = 0.5.sp
     ),
     titleSmall = TextStyle(
         fontFamily = bungeeFont,

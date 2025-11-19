@@ -22,7 +22,7 @@ class GameViewModel(
     val screenState: StateFlow<GameScreenState> = _screenState
 
     private val _correctAnswers = MutableStateFlow(0)
-    val correctAnswer: StateFlow<Int> = _correctAnswers
+    val correctAnswers: StateFlow<Int> = _correctAnswers
 
     private val _totalQuestions = MutableStateFlow(0)
     val totalQuestions: MutableStateFlow<Int> = _totalQuestions
@@ -97,7 +97,6 @@ class GameViewModel(
             return
         }
 
-        _totalQuestions.value++
         _screenState.value =
             GameScreenState.ShowQuestion(_questionsStorage.value[_currentIndex.value])
         _currentIndex.value++
@@ -109,6 +108,7 @@ class GameViewModel(
 
     fun checkAnswer(answer: Answer, answerIndex: Int) {
 
+        _totalQuestions.value++
         val question = (_screenState.value as GameScreenState.ShowQuestion).question
         val correctIndex = question.answers.indexOfFirst { it.isCorrect }
         _screenState.value = GameScreenState.ShowAnswer(
@@ -124,6 +124,14 @@ class GameViewModel(
             delay(DELAY_FOR_NEXT_QUESTION)
             nextQuestion()
         }
+    }
+
+    fun endGame() {
+
+        val result =
+            if (_correctAnswers.value == 0) 0
+            else ((_totalQuestions.value / _correctAnswers.value) * 100).coerceAtMost(100)
+        _screenState.value = GameScreenState.Result(result)
     }
 
     private suspend fun retryLoad() {

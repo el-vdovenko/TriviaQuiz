@@ -82,10 +82,15 @@ class RepositoryImpl(private val apiService: ApiService) : Repository {
                     Resource.Success(it)
                 } ?: Resource.Error(DataError.Network.EMPTY_BODY)
             } else {
-                Resource.Error(
-                    DataError.Network.UNKNOWN,
-                    message = "${response.code()} -- ${response.message()}"
-                )
+                when(response.code()) {
+                    408 -> Resource.Error(DataError.Network.REQUEST_TIMEOUT)
+                    413 -> Resource.Error(DataError.Network.PAYLOAD_TOO_LARGE)
+                    429 -> Resource.Error(DataError.Network.TOO_MANY_REQUESTS)
+                    else -> Resource.Error(
+                        DataError.Network.UNKNOWN,
+                        message = "${response.code()} -- ${response.message()}"
+                    )
+                }
             }
         } catch (e: IOException) {
             Resource.Error(DataError.Network.NO_INTERNET)

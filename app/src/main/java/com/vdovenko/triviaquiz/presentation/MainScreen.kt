@@ -32,7 +32,10 @@ fun MainScreen(
         }
         composable<Screen.Game> { backStackEntry ->
             val route = backStackEntry.toRoute<Screen.Game>()
-            GameScreen(selectCategoryId = route.selectedCategoryId)
+            GameScreen(
+                selectCategoryId = route.selectedCategoryId,
+                onTryAgainClick = { navController.popBackStack(route = Screen.Start, inclusive = false) }
+            )
         }
     }
 }
