@@ -84,7 +84,6 @@ class RepositoryImpl(private val apiService: ApiService) : Repository {
             } else {
                 when(response.code()) {
                     408 -> Resource.Error(DataError.Network.REQUEST_TIMEOUT)
-                    413 -> Resource.Error(DataError.Network.PAYLOAD_TOO_LARGE)
                     429 -> Resource.Error(DataError.Network.TOO_MANY_REQUESTS)
                     else -> Resource.Error(
                         DataError.Network.UNKNOWN,
@@ -97,7 +96,6 @@ class RepositoryImpl(private val apiService: ApiService) : Repository {
         } catch (e: HttpException) {
             when (e.code()) {
                 408 -> Resource.Error(DataError.Network.REQUEST_TIMEOUT)
-                413 -> Resource.Error(DataError.Network.PAYLOAD_TOO_LARGE)
                 429 -> Resource.Error(DataError.Network.TOO_MANY_REQUESTS)
                 else -> Resource.Error(
                     DataError.Network.UNKNOWN,

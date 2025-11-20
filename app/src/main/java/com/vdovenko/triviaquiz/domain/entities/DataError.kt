@@ -6,7 +6,6 @@ sealed interface DataError : ErrorType {
         REQUEST_TIMEOUT,
         TOO_MANY_REQUESTS,
         NO_INTERNET,
-        PAYLOAD_TOO_LARGE,
         EMPTY_BODY,
         UNKNOWN
     }

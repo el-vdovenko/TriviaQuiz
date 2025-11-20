@@ -1,6 +1,7 @@
 package com.vdovenko.triviaquiz.presentation.game
 
 import com.vdovenko.triviaquiz.domain.entities.Question
+import com.vdovenko.triviaquiz.presentation.additional.UiText
 
 sealed interface GameScreenState {
 
@@ -14,5 +15,5 @@ sealed interface GameScreenState {
 
     data object Loading : GameScreenState
 
-    data class Error(val error: String) : GameScreenState
+    data class Error(val error: UiText) : GameScreenState
 }

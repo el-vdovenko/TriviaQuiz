@@ -7,6 +7,7 @@ import com.vdovenko.triviaquiz.domain.entities.DataError
 import com.vdovenko.triviaquiz.domain.entities.Question
 import com.vdovenko.triviaquiz.domain.entities.Resource
 import com.vdovenko.triviaquiz.domain.usecases.GetQuestionsUseCase
+import com.vdovenko.triviaquiz.presentation.additional.asErrorUiText
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,7 +26,10 @@ class GameViewModel(
     val correctAnswers: StateFlow<Int> = _correctAnswers
 
     private val _totalQuestions = MutableStateFlow(0)
-    val totalQuestions: MutableStateFlow<Int> = _totalQuestions
+    val totalQuestions: StateFlow<Int> = _totalQuestions
+
+    private val _isGameActive = MutableStateFlow(false)
+    val isGameActive: StateFlow<Boolean> = _isGameActive
 
 
     private val _questionsStorage = MutableStateFlow<List<Question>>(emptyList())
@@ -63,6 +67,7 @@ class GameViewModel(
                 is Resource.Success -> {
                     _questionsStorage.value += result.data
                     _retryCount = 0
+                    _isGameActive.value = true
 
                     if (_screenState.value == GameScreenState.Loading) {
                         nextQuestion()
@@ -71,16 +76,17 @@ class GameViewModel(
 
                 is Resource.Error -> {
                     when (result.error) {
-                        DataError.Network.NO_INTERNET -> {}
                         DataError.Network.TOO_MANY_REQUESTS, DataError.Api.RATE_LIMIT -> {
-                            retryLoad()
-                            return@launch
+                            if (_retryCount >= 2) {
+                                _screenState.value = GameScreenState.Error(result.asErrorUiText())
+                                _retryCount = 0
+                            } else {
+                                retryLoad()
+                                return@launch
+                            }
                         }
 
-                        else -> {
-                            _screenState.value =
-                                GameScreenState.Error("${result.error} ${result.message}")
-                        }
+                        else -> _screenState.value = GameScreenState.Error(result.asErrorUiText())
                     }
                 }
             }
@@ -127,20 +133,17 @@ class GameViewModel(
     }
 
     fun endGame() {
-
-        val result =
+        val result: Int =
             if (_correctAnswers.value == 0) 0
-            else ((_totalQuestions.value / _correctAnswers.value) * 100).coerceAtMost(100)
+            else ((_correctAnswers.value.toFloat() / _totalQuestions.value) * 100)
+                .toInt()
+                .coerceAtMost(100)
         val isGood = result >= 50
+        _isGameActive.value = false
         _screenState.value = GameScreenState.Result(result, isGood)
     }
 
     private suspend fun retryLoad() {
-        if (_retryCount == 2) {
-            _screenState.value = GameScreenState.Error("")
-            _retryCount = 0
-            return
-        }
         _retryCount++
         delay(RETRY_DELAY)
         loadQuestions()

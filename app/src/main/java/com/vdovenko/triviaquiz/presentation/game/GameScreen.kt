@@ -4,7 +4,6 @@ import androidx.compose.animation.Animatable
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,16 +17,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -36,7 +32,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vdovenko.triviaquiz.domain.entities.Answer
@@ -45,7 +40,6 @@ import com.vdovenko.triviaquiz.ui.theme.AnswerButton
 import com.vdovenko.triviaquiz.ui.theme.BlueAccent
 import com.vdovenko.triviaquiz.ui.theme.BlueCard
 import com.vdovenko.triviaquiz.ui.theme.BlueCardBorder
-import com.vdovenko.triviaquiz.ui.theme.BlueExtraDark
 import com.vdovenko.triviaquiz.ui.theme.BlueLight
 import com.vdovenko.triviaquiz.ui.theme.GreenAccent
 import com.vdovenko.triviaquiz.ui.theme.GreenCard
@@ -55,7 +49,6 @@ import com.vdovenko.triviaquiz.ui.theme.RedAccent
 import com.vdovenko.triviaquiz.ui.theme.RedCard
 import com.vdovenko.triviaquiz.ui.theme.RedCardBorder
 import com.vdovenko.triviaquiz.ui.theme.RedLight
-import com.vdovenko.triviaquiz.ui.theme.TriviaQuizTheme
 import com.vdovenko.triviaquiz.ui.theme.bungeeFont
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -64,7 +57,8 @@ import org.koin.core.parameter.parametersOf
 fun GameScreen(
     modifier: Modifier = Modifier,
     selectCategoryId: Int?,
-    onTryAgainClick: () -> Unit
+    onTryAgainClick: () -> Unit,
+    onBackClick: () -> Unit
 ) {
 
     val viewModel: GameViewModel = koinViewModel { parametersOf(selectCategoryId) }
@@ -72,8 +66,9 @@ fun GameScreen(
     val screenState by viewModel.screenState.collectAsState()
     val totalQuestions by viewModel.totalQuestions.collectAsState()
     val correctAnswers by viewModel.correctAnswers.collectAsState()
+    val isGameActive by viewModel.isGameActive.collectAsState()
 
-    var alphaHeader by remember { mutableStateOf(1f) }
+    var alphaHeader = if (isGameActive) 1f else 0f
 
     Column(
         modifier = modifier.fillMaxSize()
@@ -88,13 +83,14 @@ fun GameScreen(
 
         when (val currentState = screenState) {
             GameScreenState.Initial -> {
-                Text("Initial")
+
             }
 
             GameScreenState.Loading -> {
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
                 ) {
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center),
@@ -121,7 +117,6 @@ fun GameScreen(
             }
 
             is GameScreenState.Result -> {
-                alphaHeader = 0f
                 Result(
                     result = currentState.result,
                     totalQuestions = totalQuestions,
@@ -132,7 +127,12 @@ fun GameScreen(
             }
 
             is GameScreenState.Error -> {
-                Text(currentState.error)
+                ErrorState(
+                    modifier = Modifier.weight(1f),
+                    isGameActive = isGameActive,
+                    error = currentState.error.asString(),
+                    onBackClick = onBackClick
+                )
             }
         }
     }
@@ -264,7 +264,8 @@ private fun ShowAnswer(
                         borderColor = correctColor.value,
                         textColor = GreenLight,
                         onClick = { },
-                        enabled = false)
+                        enabled = false
+                    )
                 } else if (correctIndex != answerIndex && index == answerIndex) {
                     AnswerButton(
                         text = answer.text,
@@ -272,12 +273,14 @@ private fun ShowAnswer(
                         borderColor = incorrectColor.value,
                         textColor = RedLight,
                         onClick = { },
-                        enabled = false)
+                        enabled = false
+                    )
                 } else {
                     AnswerButton(
                         text = answer.text,
                         onClick = { },
-                        enabled = false)
+                        enabled = false
+                    )
                 }
             }
         }
@@ -357,6 +360,43 @@ private fun Result(
                 fontFamily = bungeeFont,
                 text = "Play again"
             )
+        }
+    }
+}
+
+@Composable
+private fun ErrorState(
+    modifier: Modifier = Modifier,
+    isGameActive: Boolean,
+    error: String,
+    onBackClick: () -> Unit
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            modifier = Modifier.padding(
+                start = 32.dp,
+                end = 32.dp,
+                bottom = 24.dp,
+                top = 0.dp
+            ),
+            color = BlueLight,
+            textAlign = TextAlign.Center,
+            text = "Oops! $error"
+        )
+        if (!isGameActive) {
+            TextButton(
+                onClick = { onBackClick() }
+            ) {
+                Text(
+                    color = BlueAccent,
+                    text = "Back"
+                )
+            }
         }
     }
 }

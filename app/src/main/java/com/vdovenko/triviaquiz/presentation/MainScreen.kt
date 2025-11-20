@@ -34,7 +34,8 @@ fun MainScreen(
             val route = backStackEntry.toRoute<Screen.Game>()
             GameScreen(
                 selectCategoryId = route.selectedCategoryId,
-                onTryAgainClick = { navController.popBackStack(route = Screen.Start, inclusive = false) }
+                onTryAgainClick = { navController.popBackStack(route = Screen.Start, inclusive = false) },
+                onBackClick = { navController.popBackStack(route = Screen.SelectCategory, inclusive = false) }
             )
         }
     }
