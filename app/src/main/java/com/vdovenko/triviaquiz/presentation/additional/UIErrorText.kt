@@ -15,6 +15,10 @@ fun DataError.asUiText(message: String? = null): UiText {
             R.string.error_too_many_requests
         )
 
+        DataError.Api.TOKEN_EMPTY -> UiText.StringResource(
+            R.string.error_no_question_for_token
+        )
+
         DataError.Network.NO_INTERNET -> UiText.StringResource(
             R.string.error_no_internet
         )

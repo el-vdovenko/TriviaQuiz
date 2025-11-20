@@ -50,25 +50,26 @@ class RepositoryImpl(private val apiService: ApiService) : Repository {
             when (response) {
                 is Resource.Success -> {
                     val responseCode = response.data.responseCode
-                    when (responseCode) {
-                        0 -> {
-                            val data = response.data.questionsList.map { it.toEntity() }
-                            Resource.Success(data)
-                        }
-                        1 -> Resource.Error(DataError.Api.NO_RESULTS)
-                        2 -> Resource.Error(DataError.Api.INVALID_PARAMETER)
-                        3 -> Resource.Error(DataError.Api.TOKEN_NOT_FOUND)
-                        4 -> Resource.Error(DataError.Api.TOKEN_EMPTY)
-                        5 -> Resource.Error(DataError.Api.RATE_LIMIT)
-                        else -> Resource.Error(
-                            DataError.Api.UNKNOWN_CODE,
-                            message = responseCode.toString()
-                        )
-                    }
+                    handleApiAnswer(responseCode, response.data.questionsList.map { it.toEntity() })
                 }
 
                 is Resource.Error -> {
                     response as Resource<List<Question>, DataError>
+                }
+            }
+        }
+    }
+
+    override suspend fun getToken(): Resource<String, DataError> {
+        return withContext(Dispatchers.IO) {
+            val response = safeApiCall { apiService.getToken() }
+            when(response) {
+                is Resource.Success -> {
+                    val responseCode = response.data.responseCode
+                    handleApiAnswer(responseCode, response.data.token)
+                }
+                is Resource.Error -> {
+                    response as Resource<String, DataError>
                 }
             }
         }
@@ -104,6 +105,21 @@ class RepositoryImpl(private val apiService: ApiService) : Repository {
             }
         } catch (e: Exception) {
             Resource.Error(DataError.Network.UNKNOWN, message = e.localizedMessage)
+        }
+    }
+
+    private fun <T> handleApiAnswer(responseCode: Int, successData: T): Resource<T, DataError> {
+        return when (responseCode) {
+            0 -> Resource.Success(successData)
+            1 -> Resource.Error(DataError.Api.NO_RESULTS)
+            2 -> Resource.Error(DataError.Api.INVALID_PARAMETER)
+            3 -> Resource.Error(DataError.Api.TOKEN_NOT_FOUND)
+            4 -> Resource.Error(DataError.Api.TOKEN_EMPTY)
+            5 -> Resource.Error(DataError.Api.RATE_LIMIT)
+            else -> Resource.Error(
+                DataError.Api.UNKNOWN_CODE,
+                message = responseCode.toString()
+            )
         }
     }
 }

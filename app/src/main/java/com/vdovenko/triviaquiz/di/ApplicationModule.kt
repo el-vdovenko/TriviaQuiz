@@ -11,5 +11,5 @@ val applicationModule = module {
 
     viewModelOf(::SelectCategoryViewModel)
 
-    viewModel { parameters -> GameViewModel(get(), selectedCategoryId = parameters.getOrNull()) }
+    viewModel { parameters -> GameViewModel(get(), get(), selectedCategoryId = parameters.getOrNull()) }
 }

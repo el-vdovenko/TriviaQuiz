@@ -7,6 +7,7 @@ import com.vdovenko.triviaquiz.domain.entities.DataError
 import com.vdovenko.triviaquiz.domain.entities.Question
 import com.vdovenko.triviaquiz.domain.entities.Resource
 import com.vdovenko.triviaquiz.domain.usecases.GetQuestionsUseCase
+import com.vdovenko.triviaquiz.domain.usecases.GetTokenUseCase
 import com.vdovenko.triviaquiz.presentation.additional.asErrorUiText
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,6 +16,7 @@ import kotlinx.coroutines.launch
 
 class GameViewModel(
     private val getQuestionsUseCase: GetQuestionsUseCase,
+    private val getTokenUseCase: GetTokenUseCase,
     private val selectedCategoryId: Int?
 ) : ViewModel() {
 
@@ -31,6 +33,8 @@ class GameViewModel(
     private val _isGameActive = MutableStateFlow(false)
     val isGameActive: StateFlow<Boolean> = _isGameActive
 
+
+    private var _token = ""
 
     private val _questionsStorage = MutableStateFlow<List<Question>>(emptyList())
 
@@ -56,7 +60,30 @@ class GameViewModel(
 
         viewModelScope.launch {
 
+            when (val resultToken = getTokenUseCase()) {
+                is Resource.Success -> {
+                    _token = resultToken.data
+                }
+
+                is Resource.Error -> {
+                    when (resultToken.error) {
+                        DataError.Network.TOO_MANY_REQUESTS, DataError.Api.RATE_LIMIT -> {
+                            if (_retryCount >= 2) {
+                                _screenState.value = GameScreenState.Error(resultToken.asErrorUiText())
+                                _retryCount = 0
+                            } else {
+                                retryLoad()
+                                return@launch
+                            }
+                        }
+
+                        else -> _screenState.value = GameScreenState.Error(resultToken.asErrorUiText())
+                    }
+                }
+            }
+
             val result = getQuestionsUseCase(
+                sessionToken = _token,
                 categoryId = selectedCategoryId,
                 difficulty = "medium",
                 amount = QUESTIONS_LOAD_AMOUNT

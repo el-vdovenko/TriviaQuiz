@@ -3,5 +3,6 @@
     <string name="error_no_results">There are no questions in this category yet</string>
     <string name="error_too_many_requests">Too many requests</string>
     <string name="error_no_internet">No internet connection</string>
+    <string name="error_no_question_for_token">Sorry, we ran out of questions for you</string>
     <string name="error_general">Error %s</string>
 </resources>

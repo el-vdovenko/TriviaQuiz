@@ -15,4 +15,6 @@ interface Repository {
         difficulty: String,
         amount: Int
     ): Resource<List<Question>, DataError>
+
+    suspend fun getToken(): Resource<String, DataError>
 }
