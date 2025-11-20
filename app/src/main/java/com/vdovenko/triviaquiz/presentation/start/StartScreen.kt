@@ -15,10 +15,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.vdovenko.triviaquiz.ui.theme.BlueAccent
-import com.vdovenko.triviaquiz.ui.theme.TriviaQuizTypography
-import com.vdovenko.triviaquiz.ui.theme.bungeeFont
+import com.vdovenko.triviaquiz.R
+import com.vdovenko.triviaquiz.presentation.ui.theme.BlueAccent
+import com.vdovenko.triviaquiz.presentation.ui.theme.TriviaQuizTypography
+import com.vdovenko.triviaquiz.presentation.ui.theme.bungeeFont
 
 @Composable
 fun StartScreen(
@@ -44,11 +46,11 @@ fun StartScreen(
                 Text(
                     modifier = Modifier.padding(bottom = 24.dp),
                     style = TriviaQuizTypography.titleMedium,
-                    text = "Welcome to"
+                    text = stringResource(R.string.title_welcome)
                 )
                 Text(
                     style = TriviaQuizTypography.titleLarge,
-                    text = "TriviaQuiz"
+                    text = stringResource(R.string.app_name)
                 )
                 Spacer(modifier = Modifier.height(96.dp))
                 Button(
@@ -61,7 +63,7 @@ fun StartScreen(
                 ) {
                     Text(
                         fontFamily = bungeeFont,
-                        text = "Start"
+                        text = stringResource(R.string.button_start)
                     )
                 }
             }

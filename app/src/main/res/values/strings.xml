@@ -1,8 +1,19 @@
 <resources>
     <string name="app_name">TriviaQuiz</string>
+    <string name="header_result">Result </string>
     <string name="error_no_results">There are no questions in this category yet</string>
     <string name="error_too_many_requests">Too many requests</string>
     <string name="error_no_internet">No internet connection</string>
     <string name="error_no_question_for_token">Sorry, we ran out of questions for you</string>
     <string name="error_general">Error %s</string>
+    <string name="button_end_game">End game</string>
+    <string name="result_title">Your result:</string>
+    <string name="label_total_questions">Total questions:</string>
+    <string name="label_correct_answers">Correct answers:</string>
+    <string name="button_play_again">Play again</string>
+    <string name="button_back">Back</string>
+    <string name="button_start">Start</string>
+    <string name="title_welcome">Welcome to</string>
+    <string name="header_select_category">Select Category</string>
+    <string name="category_all">All</string>
 </resources>

@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.vdovenko.triviaquiz.ui.theme.BlueExtraDark
-import com.vdovenko.triviaquiz.ui.theme.TriviaQuizTheme
+import com.vdovenko.triviaquiz.presentation.ui.theme.BlueExtraDark
+import com.vdovenko.triviaquiz.presentation.ui.theme.TriviaQuizTheme
 
 class MainActivity : ComponentActivity() {
 

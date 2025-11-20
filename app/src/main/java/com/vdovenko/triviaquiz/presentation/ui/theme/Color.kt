@@ -1,4 +1,4 @@
-package com.vdovenko.triviaquiz.ui.theme
+package com.vdovenko.triviaquiz.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

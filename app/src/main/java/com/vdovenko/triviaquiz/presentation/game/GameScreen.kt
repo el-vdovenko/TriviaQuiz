@@ -28,28 +28,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vdovenko.triviaquiz.R
 import com.vdovenko.triviaquiz.domain.entities.Answer
 import com.vdovenko.triviaquiz.domain.entities.Question
-import com.vdovenko.triviaquiz.ui.theme.AnswerButton
-import com.vdovenko.triviaquiz.ui.theme.BlueAccent
-import com.vdovenko.triviaquiz.ui.theme.BlueCard
-import com.vdovenko.triviaquiz.ui.theme.BlueCardBorder
-import com.vdovenko.triviaquiz.ui.theme.BlueLight
-import com.vdovenko.triviaquiz.ui.theme.GreenAccent
-import com.vdovenko.triviaquiz.ui.theme.GreenCard
-import com.vdovenko.triviaquiz.ui.theme.GreenCardBorder
-import com.vdovenko.triviaquiz.ui.theme.GreenLight
-import com.vdovenko.triviaquiz.ui.theme.RedAccent
-import com.vdovenko.triviaquiz.ui.theme.RedCard
-import com.vdovenko.triviaquiz.ui.theme.RedCardBorder
-import com.vdovenko.triviaquiz.ui.theme.RedLight
-import com.vdovenko.triviaquiz.ui.theme.bungeeFont
+import com.vdovenko.triviaquiz.presentation.ui.theme.AnswerButton
+import com.vdovenko.triviaquiz.presentation.ui.theme.BlueAccent
+import com.vdovenko.triviaquiz.presentation.ui.theme.BlueCard
+import com.vdovenko.triviaquiz.presentation.ui.theme.BlueCardBorder
+import com.vdovenko.triviaquiz.presentation.ui.theme.BlueLight
+import com.vdovenko.triviaquiz.presentation.ui.theme.GreenAccent
+import com.vdovenko.triviaquiz.presentation.ui.theme.GreenCard
+import com.vdovenko.triviaquiz.presentation.ui.theme.GreenCardBorder
+import com.vdovenko.triviaquiz.presentation.ui.theme.GreenLight
+import com.vdovenko.triviaquiz.presentation.ui.theme.RedAccent
+import com.vdovenko.triviaquiz.presentation.ui.theme.RedCard
+import com.vdovenko.triviaquiz.presentation.ui.theme.RedCardBorder
+import com.vdovenko.triviaquiz.presentation.ui.theme.RedLight
+import com.vdovenko.triviaquiz.presentation.ui.theme.bungeeFont
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -68,7 +70,7 @@ fun GameScreen(
     val correctAnswers by viewModel.correctAnswers.collectAsState()
     val isGameActive by viewModel.isGameActive.collectAsState()
 
-    var alphaHeader = if (isGameActive) 1f else 0f
+    val alphaHeader = if (isGameActive) 1f else 0f
 
     Column(
         modifier = modifier.fillMaxSize()
@@ -158,7 +160,7 @@ private fun GameHeader(
             color = BlueLight,
             fontSize = 16.sp,
             text = buildAnnotatedString {
-                append("Result ")
+                append(stringResource(R.string.header_result))
                 withStyle(style = SpanStyle(color = GreenAccent)) {
                     append(correctAnswers.toString())
                 }
@@ -173,7 +175,7 @@ private fun GameHeader(
         ) {
             Text(
                 fontFamily = bungeeFont,
-                text = "End game"
+                text = stringResource(R.string.button_end_game)
             )
         }
     }
@@ -306,7 +308,7 @@ private fun Result(
             fontFamily = bungeeFont,
             fontSize = 22.sp,
             color = Color.White,
-            text = "Your result:"
+            text = stringResource(R.string.result_title)
         )
         Text(
             fontFamily = bungeeFont,
@@ -323,7 +325,7 @@ private fun Result(
         ) {
             Text(
                 color = BlueLight,
-                text = "Total questions:"
+                text = stringResource(R.string.label_total_questions)
             )
             Text(
                 fontFamily = bungeeFont,
@@ -339,7 +341,7 @@ private fun Result(
         ) {
             Text(
                 color = BlueLight,
-                text = "Correct answers:"
+                text = stringResource(R.string.label_correct_answers)
             )
             Text(
                 fontFamily = bungeeFont,
@@ -358,7 +360,7 @@ private fun Result(
         ) {
             Text(
                 fontFamily = bungeeFont,
-                text = "Play again"
+                text = stringResource(R.string.button_play_again)
             )
         }
     }
@@ -394,7 +396,7 @@ private fun ErrorState(
             ) {
                 Text(
                     color = BlueAccent,
-                    text = "Back"
+                    text = stringResource(R.string.button_back)
                 )
             }
         }

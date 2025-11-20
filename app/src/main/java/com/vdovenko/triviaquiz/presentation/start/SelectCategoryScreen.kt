@@ -15,12 +15,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.vdovenko.triviaquiz.R
 import com.vdovenko.triviaquiz.domain.entities.Category
-import com.vdovenko.triviaquiz.ui.theme.BlueAccent
-import com.vdovenko.triviaquiz.ui.theme.BlueCard
-import com.vdovenko.triviaquiz.ui.theme.CategoryAnswer
-import com.vdovenko.triviaquiz.ui.theme.TriviaQuizTypography
+import com.vdovenko.triviaquiz.presentation.ui.theme.BlueAccent
+import com.vdovenko.triviaquiz.presentation.ui.theme.BlueCard
+import com.vdovenko.triviaquiz.presentation.ui.theme.CategoryAnswer
+import com.vdovenko.triviaquiz.presentation.ui.theme.TriviaQuizTypography
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -38,9 +40,7 @@ fun SelectCategoryScreen(
     ) {
         when (val currentState = screenState) {
 
-            SelectCategoryScreenState.Initial -> {
-                Text("Initial")
-            }
+            SelectCategoryScreenState.Initial -> {  }
 
             is SelectCategoryScreenState.CategoriesLoaded -> {
                 SelectCategory(
@@ -83,14 +83,14 @@ fun SelectCategory(
         Text(
             modifier = Modifier.padding(top = 40.dp, bottom = 12.dp),
             style = TriviaQuizTypography.titleSmall,
-            text = "Select Category"
+            text = stringResource(R.string.header_select_category)
         )
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             item {
                 CategoryAnswer(
-                    text = "All",
+                    text = stringResource(R.string.category_all),
                     onClick = { onClickCategory(null) }
                 )
             }
