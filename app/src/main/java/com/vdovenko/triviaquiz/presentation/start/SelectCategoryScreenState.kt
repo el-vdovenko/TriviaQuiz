@@ -1,6 +1,7 @@
 package com.vdovenko.triviaquiz.presentation.start
 
 import com.vdovenko.triviaquiz.domain.entities.Category
+import com.vdovenko.triviaquiz.presentation.additional.UiText
 
 sealed interface SelectCategoryScreenState {
 
@@ -10,5 +11,5 @@ sealed interface SelectCategoryScreenState {
 
     data object Loading : SelectCategoryScreenState
 
-    data class Error(val message: String) : SelectCategoryScreenState
+    data class Error(val error: UiText) : SelectCategoryScreenState
 }

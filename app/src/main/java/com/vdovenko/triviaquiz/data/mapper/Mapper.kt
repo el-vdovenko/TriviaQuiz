@@ -22,11 +22,6 @@ fun CategoryDTO.toEntity(): Category = Category(
     name = convertText(name)
 )
 
-fun Category.toModel(): CategoryDTO = CategoryDTO(
-    id = id,
-    name = name
-)
-
 fun stringToAnswer(text: String, isCorrect: Boolean = false) = Answer(text, isCorrect)
 
 fun convertText(text: String) =

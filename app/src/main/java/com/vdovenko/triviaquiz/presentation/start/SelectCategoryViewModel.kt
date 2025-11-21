@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.vdovenko.triviaquiz.domain.entities.DataError
 import com.vdovenko.triviaquiz.domain.entities.Resource
 import com.vdovenko.triviaquiz.domain.usecases.GetCategoriesUseCase
+import com.vdovenko.triviaquiz.presentation.additional.asErrorUiText
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,7 +25,7 @@ class SelectCategoryViewModel(
         loadCategories()
     }
 
-    private fun loadCategories() {
+    fun loadCategories() {
 
         _screenState.value = SelectCategoryScreenState.Loading
 
@@ -38,15 +39,19 @@ class SelectCategoryViewModel(
 
                 is Resource.Error -> {
                     when (result.error) {
-                        DataError.Network.NO_INTERNET -> {}
                         DataError.Network.TOO_MANY_REQUESTS, DataError.Api.RATE_LIMIT -> {
-                            retryLoad()
-                            return@launch
+                            if (_retryCount >= 2) {
+                                _screenState.value =
+                                    SelectCategoryScreenState.Error(result.asErrorUiText())
+                                _retryCount = 0
+                            } else {
+                                retryLoad()
+                                return@launch
+                            }
                         }
-                        else -> {
-                            _screenState.value =
-                                SelectCategoryScreenState.Error("${result.error} ${result.message}")
-                        }
+
+                        else -> _screenState.value =
+                            SelectCategoryScreenState.Error(result.asErrorUiText())
                     }
                 }
             }
@@ -54,11 +59,6 @@ class SelectCategoryViewModel(
     }
 
     private suspend fun retryLoad() {
-        if (_retryCount == 2) {
-            _screenState.value = SelectCategoryScreenState.Error("")
-            _retryCount = 0
-            return
-        }
         _retryCount++
         delay(RETRY_DELAY)
         loadCategories()

@@ -12,6 +12,7 @@ import com.vdovenko.triviaquiz.presentation.additional.asErrorUiText
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class GameViewModel(
@@ -60,24 +61,28 @@ class GameViewModel(
 
         viewModelScope.launch {
 
-            when (val resultToken = getTokenUseCase()) {
-                is Resource.Success -> {
-                    _token = resultToken.data
-                }
+            if (_token.isEmpty()) {
+                when (val result = getTokenUseCase()) {
+                    is Resource.Success -> {
+                        _token = result.data
+                    }
 
-                is Resource.Error -> {
-                    when (resultToken.error) {
-                        DataError.Network.TOO_MANY_REQUESTS, DataError.Api.RATE_LIMIT -> {
-                            if (_retryCount >= 2) {
-                                _screenState.value = GameScreenState.Error(resultToken.asErrorUiText())
-                                _retryCount = 0
-                            } else {
-                                retryLoad()
-                                return@launch
+                    is Resource.Error -> {
+                        when (result.error) {
+                            DataError.Network.TOO_MANY_REQUESTS, DataError.Api.RATE_LIMIT -> {
+                                if (_retryCount >= 2) {
+                                    _screenState.value =
+                                        GameScreenState.Error(result.asErrorUiText())
+                                    _retryCount = 0
+                                } else {
+                                    retryLoad()
+                                    return@launch
+                                }
                             }
-                        }
 
-                        else -> _screenState.value = GameScreenState.Error(resultToken.asErrorUiText())
+                            else -> _screenState.value =
+                                GameScreenState.Error(result.asErrorUiText())
+                        }
                     }
                 }
             }
@@ -92,7 +97,7 @@ class GameViewModel(
 
             when (result) {
                 is Resource.Success -> {
-                    _questionsStorage.value += result.data
+                    updateStorage(result.data)
                     _retryCount = 0
                     _isGameActive.value = true
 
@@ -102,18 +107,22 @@ class GameViewModel(
                 }
 
                 is Resource.Error -> {
-                    when (result.error) {
-                        DataError.Network.TOO_MANY_REQUESTS, DataError.Api.RATE_LIMIT -> {
-                            if (_retryCount >= 2) {
-                                _screenState.value = GameScreenState.Error(result.asErrorUiText())
-                                _retryCount = 0
-                            } else {
-                                retryLoad()
-                                return@launch
+                    if (!_isGameActive.value || _screenState.value is GameScreenState.Loading) {
+                        when (result.error) {
+                            DataError.Network.TOO_MANY_REQUESTS, DataError.Api.RATE_LIMIT -> {
+                                if (_retryCount >= 2) {
+                                    _screenState.value =
+                                        GameScreenState.Error(result.asErrorUiText())
+                                    _retryCount = 0
+                                } else {
+                                    retryLoad()
+                                    return@launch
+                                }
                             }
-                        }
 
-                        else -> _screenState.value = GameScreenState.Error(result.asErrorUiText())
+                            else -> _screenState.value =
+                                GameScreenState.Error(result.asErrorUiText())
+                        }
                     }
                 }
             }
@@ -132,7 +141,7 @@ class GameViewModel(
 
         _screenState.value =
             GameScreenState.ShowQuestion(_questionsStorage.value[_currentIndex.value])
-        _currentIndex.value++
+        _currentIndex.update { it + 1 }
 
         if (_currentIndex.value == _questionsStorage.value.size - 2) {
             loadQuestions()
@@ -170,6 +179,17 @@ class GameViewModel(
         _screenState.value = GameScreenState.Result(result, isGood)
     }
 
+    private fun updateStorage(new: List<Question>) {
+        _questionsStorage.update {
+            val updated = it + new
+            if (updated.size > QUESTIONS_LIMIT) {
+                val takeLast = updated.size - _currentIndex.value
+                _currentIndex.update { 0 }
+                updated.takeLast(takeLast)
+            } else updated
+        }
+    }
+
     private suspend fun retryLoad() {
         _retryCount++
         delay(RETRY_DELAY)
@@ -179,6 +199,7 @@ class GameViewModel(
     companion object {
 
         private const val QUESTIONS_LOAD_AMOUNT = 20
+        private const val QUESTIONS_LIMIT = 50
         private const val RETRY_DELAY = 5000L
         private const val DELAY_FOR_NEXT_QUESTION = 1500L
     }

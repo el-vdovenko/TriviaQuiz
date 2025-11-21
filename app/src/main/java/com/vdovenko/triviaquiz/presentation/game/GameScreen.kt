@@ -161,6 +161,7 @@ private fun GameHeader(
             fontSize = 16.sp,
             text = buildAnnotatedString {
                 append(stringResource(R.string.header_result))
+                append(" ")
                 withStyle(style = SpanStyle(color = GreenAccent)) {
                     append(correctAnswers.toString())
                 }

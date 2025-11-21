@@ -10,17 +10,20 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.vdovenko.triviaquiz.R
 import com.vdovenko.triviaquiz.domain.entities.Category
 import com.vdovenko.triviaquiz.presentation.ui.theme.BlueAccent
 import com.vdovenko.triviaquiz.presentation.ui.theme.BlueCard
+import com.vdovenko.triviaquiz.presentation.ui.theme.BlueLight
 import com.vdovenko.triviaquiz.presentation.ui.theme.CategoryAnswer
 import com.vdovenko.triviaquiz.presentation.ui.theme.TriviaQuizTypography
 import org.koin.androidx.compose.koinViewModel
@@ -40,7 +43,7 @@ fun SelectCategoryScreen(
     ) {
         when (val currentState = screenState) {
 
-            SelectCategoryScreenState.Initial -> {  }
+            SelectCategoryScreenState.Initial -> {}
 
             is SelectCategoryScreenState.CategoriesLoaded -> {
                 SelectCategory(
@@ -50,7 +53,10 @@ fun SelectCategoryScreen(
             }
 
             is SelectCategoryScreenState.Error -> {
-                Text(text = currentState.message)
+                ErrorState(
+                    error = currentState.error.asString(),
+                    onRetryClick = { viewModel.loadCategories() }
+                )
             }
 
             SelectCategoryScreenState.Loading -> {
@@ -100,6 +106,40 @@ fun SelectCategory(
                     onClick = { onClickCategory(it.id) }
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun ErrorState(
+    modifier: Modifier = Modifier,
+    error: String,
+    onRetryClick: () -> Unit
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            modifier = Modifier.padding(
+                start = 32.dp,
+                end = 32.dp,
+                bottom = 24.dp,
+                top = 0.dp
+            ),
+            color = BlueLight,
+            textAlign = TextAlign.Center,
+            text = "Oops! $error"
+        )
+        TextButton(
+            onClick = { onRetryClick() }
+        ) {
+            Text(
+                color = BlueAccent,
+                text = stringResource(R.string.button_retry)
+            )
         }
     }
 }
