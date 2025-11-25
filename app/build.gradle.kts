@@ -55,9 +55,6 @@ dependencies {
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.gsonConverter)
 
-    implementation(libs.dagger.core)
-    ksp(libs.dagger.compiler)
-
     implementation(libs.androidx.navigation.compose)
 
     implementation(libs.koin.core)
