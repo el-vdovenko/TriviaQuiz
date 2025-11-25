@@ -1,5 +1,6 @@
 package com.vdovenko.triviaquiz.presentation.game
 
+import android.content.res.Configuration
 import androidx.compose.animation.Animatable
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.infiniteRepeatable
@@ -28,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -72,6 +74,9 @@ fun GameScreen(
 
     val alphaHeader = if (isGameActive) 1f else 0f
 
+    val isLandscape =
+        LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+
     Column(
         modifier = modifier.fillMaxSize()
     ) {
@@ -104,18 +109,33 @@ fun GameScreen(
             }
 
             is GameScreenState.ShowQuestion -> {
-                ShowQuestion(
-                    question = currentState.question,
-                    onAnswerClick = { answer, index -> viewModel.checkAnswer(answer, index) }
-                )
+                if (isLandscape) {
+                    ShowQuestionHorizontal(
+                        question = currentState.question,
+                        onAnswerClick = { answer, index -> viewModel.checkAnswer(answer, index) }
+                    )
+                } else {
+                    ShowQuestion(
+                        question = currentState.question,
+                        onAnswerClick = { answer, index -> viewModel.checkAnswer(answer, index) }
+                    )
+                }
             }
 
             is GameScreenState.ShowAnswer -> {
-                ShowAnswer(
-                    question = currentState.question,
-                    answerIndex = currentState.answerIndex,
-                    correctIndex = currentState.correctIndex
-                )
+                if (isLandscape) {
+                    ShowAnswerHorizontal(
+                        question = currentState.question,
+                        answerIndex = currentState.answerIndex,
+                        correctIndex = currentState.correctIndex
+                    )
+                } else {
+                    ShowAnswer(
+                        question = currentState.question,
+                        answerIndex = currentState.answerIndex,
+                        correctIndex = currentState.correctIndex
+                    )
+                }
             }
 
             is GameScreenState.Result -> {
@@ -199,23 +219,120 @@ private fun ShowQuestion(
         )
 
         //Answers
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            question.answers.forEachIndexed { index, answer ->
-                AnswerButton(
-                    text = answer.text,
-                    onClick = { onAnswerClick(answer, index) })
-            }
-        }
+        Answers(
+            modifier = Modifier.fillMaxWidth(),
+            question = question,
+            onAnswerClick = onAnswerClick
+        )
+    }
+}
+
+@Composable
+private fun ShowQuestionHorizontal(
+    modifier: Modifier = Modifier,
+    question: Question,
+    onAnswerClick: (Answer, Int) -> Unit
+) {
+    Row(
+        modifier = modifier.fillMaxSize(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        //Question
+        Question(
+            modifier = Modifier.weight(1f),
+            text = question.question
+        )
+
+        //Answers
+        Answers(
+            modifier = Modifier.weight(1f),
+            question = question,
+            onAnswerClick = onAnswerClick
+        )
     }
 }
 
 @Composable
 private fun ShowAnswer(
+    modifier: Modifier = Modifier,
+    question: Question,
+    answerIndex: Int,
+    correctIndex: Int
+) {
+
+    Column(
+        modifier = modifier.fillMaxSize()
+    ) {
+
+        //Question
+        Question(
+            modifier = Modifier.weight(1f),
+            text = question.question
+        )
+
+        //Answers
+        AnswersCheck(
+            modifier = Modifier.fillMaxWidth(),
+            question = question,
+            answerIndex = answerIndex,
+            correctIndex = correctIndex,
+        )
+
+    }
+}
+
+@Composable
+private fun ShowAnswerHorizontal(
+    modifier: Modifier = Modifier,
+    question: Question,
+    answerIndex: Int,
+    correctIndex: Int
+) {
+
+    Row(
+        modifier = modifier.fillMaxSize(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        //Question
+        Question(
+            modifier = Modifier.weight(1f),
+            text = question.question
+        )
+
+        //Answers
+        AnswersCheck(
+            modifier = Modifier.weight(1f),
+            question = question,
+            answerIndex = answerIndex,
+            correctIndex = correctIndex,
+        )
+
+    }
+}
+
+@Composable
+private fun Answers(
+    modifier: Modifier = Modifier,
+    question: Question,
+    onAnswerClick: (Answer, Int) -> Unit
+) {
+    Column(
+        modifier = modifier
+            .padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        question.answers.forEachIndexed { index, answer ->
+            AnswerButton(
+                text = answer.text,
+                onClick = { onAnswerClick(answer, index) })
+        }
+    }
+}
+
+@Composable
+private fun AnswersCheck(
     modifier: Modifier = Modifier,
     question: Question,
     answerIndex: Int,
@@ -242,49 +359,36 @@ private fun ShowAnswer(
     }
 
     Column(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
+        question.answers.forEachIndexed { index, answer ->
 
-        //Question
-        Question(
-            modifier = Modifier.weight(1f),
-            text = question.question
-        )
-
-        //Answers
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            question.answers.forEachIndexed { index, answer ->
-
-                if (index == correctIndex) {
-                    AnswerButton(
-                        text = answer.text,
-                        containerColor = GreenCard,
-                        borderColor = correctColor.value,
-                        textColor = GreenLight,
-                        onClick = { },
-                        enabled = false
-                    )
-                } else if (correctIndex != answerIndex && index == answerIndex) {
-                    AnswerButton(
-                        text = answer.text,
-                        containerColor = RedCard,
-                        borderColor = incorrectColor.value,
-                        textColor = RedLight,
-                        onClick = { },
-                        enabled = false
-                    )
-                } else {
-                    AnswerButton(
-                        text = answer.text,
-                        onClick = { },
-                        enabled = false
-                    )
-                }
+            if (index == correctIndex) {
+                AnswerButton(
+                    text = answer.text,
+                    containerColor = GreenCard,
+                    borderColor = correctColor.value,
+                    textColor = GreenLight,
+                    onClick = { },
+                    enabled = false
+                )
+            } else if (correctIndex != answerIndex && index == answerIndex) {
+                AnswerButton(
+                    text = answer.text,
+                    containerColor = RedCard,
+                    borderColor = incorrectColor.value,
+                    textColor = RedLight,
+                    onClick = { },
+                    enabled = false
+                )
+            } else {
+                AnswerButton(
+                    text = answer.text,
+                    onClick = { },
+                    enabled = false
+                )
             }
         }
     }
@@ -321,7 +425,7 @@ private fun Result(
         Row(
             modifier = Modifier
                 .padding(start = 32.dp, end = 40.dp)
-                .fillMaxWidth(),
+                .width(256.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
@@ -337,7 +441,7 @@ private fun Result(
         Row(
             modifier = Modifier
                 .padding(start = 32.dp, end = 40.dp)
-                .fillMaxWidth(),
+                .width(256.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
